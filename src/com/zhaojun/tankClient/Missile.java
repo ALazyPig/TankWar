@@ -14,7 +14,7 @@ public class Missile {
 	private TankClient tankClient;
 	private int x;
 	private int y;
-	//private boolean live = true;
+	private boolean live = true;
 	private Tank.Direction dir;
 	public Missile(int x, int y, Direction dir, TankClient tankClient) {
 		this.x = x;
@@ -24,6 +24,9 @@ public class Missile {
 	}
 	
 	public void paint(Graphics g) {
+		if(!live){
+			return;
+		} 			
 		Color c = g.getColor();
 		g.setColor(Color.red);
 		g.fillOval(x, y, MISSILE_LENGTH, MISSILE_HIGTH);
@@ -46,15 +49,19 @@ public class Missile {
 		if(x < 0 || y < 0 || x > TankClient.GAME_LENGTH || y > TankClient.GAME_HIGTH) 
 			tankClient.getMissileList().remove(this);
 	}
-	/*public boolean isLive() {
+	public boolean isLive() {
 		return live;
-	}*/
+	}
 	public Rectangle getRectangle(){
 		return new Rectangle(x, y, MISSILE_LENGTH, MISSILE_HIGTH);
 	}
 	public boolean hitTank(Tank tank){
-		if(this.getRectangle().intersects(tank.getRectangle())) 
+		if(this.getRectangle().intersects(tank.getRectangle()) && tank.isLive()) {
+			tank.setLive(false);
+			live = false;
+			tankClient.getExplodeList().add(new Explode(x, y, tankClient));
 			return true;
+		}			
 		return false;
 	}
 }

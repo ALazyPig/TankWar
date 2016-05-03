@@ -15,11 +15,11 @@ public class TankClient extends Frame{
 	
 	private static final long serialVersionUID = 8691694202623904542L;
 	private List<Missile> missileList = new ArrayList<Missile>();
+	private List<Explode> explodeList = new ArrayList<Explode>();
 	public static final int GAME_LENGTH = 800; //定义常量，灵活
 	public static final int GAME_HIGTH = 600;
 	private Tank myTank = new Tank(50,50,true,this);
 	private Tank enemyTank = new Tank(100,100,false,this);
-	private Missile missile;
 	private Image image = this.createImage(GAME_LENGTH,GAME_HIGTH);
 	public void lauchFrame(){
 		this.setLocation(100, 10);
@@ -38,13 +38,15 @@ public class TankClient extends Frame{
 	}
 	public void paint(Graphics g) {
 		g.drawString("missileList.count:"+missileList.size(), 10, 50);
-		myTank.paint(g);
+		myTank.paint(g);	
 		enemyTank.paint(g);
 		for (Missile missile : missileList) {
+			missile.hitTank(enemyTank);
 			missile.paint(g);
 		}
-		/*if(missile != null)
-			missile.paint(g);*/
+		for (Explode explode : explodeList) {
+			explode.paint(g);
+		}
 	}
 	
 	@Override
@@ -90,17 +92,17 @@ public class TankClient extends Frame{
 		TankClient tankClient = new TankClient();		
 		tankClient.lauchFrame();
 	}
-	public Missile getMissile() {
-		return missile;
-	}
-	public void setMissile(Missile missile) {
-		this.missile = missile;
-	}
 	public List<Missile> getMissileList() {
 		return missileList;
 	}
 	public void setMissileList(List<Missile> missileList) {
 		this.missileList = missileList;
+	}
+	public List<Explode> getExplodeList() {
+		return explodeList;
+	}
+	public void setExplodeList(List<Explode> explodeList) {
+		this.explodeList = explodeList;
 	}
 	
 }

@@ -16,6 +16,8 @@ public class Tank {				//面向对象，隐藏细节
 	private TankClient tankClient;
 	private Direction dir = Direction.STOP;
 	private Direction barrel = Direction.DOWN;
+	private boolean live = true;
+	
 	public enum Direction {
 		UP,UP_RIGHT,RIGHT,RIGHT_DOWN,DOWN,LEFT_DOWN,LEFT,UP_LEFT,STOP
 	};	
@@ -31,6 +33,7 @@ public class Tank {				//面向对象，隐藏细节
 	}
 
 	public void paint(Graphics g) {
+		if(!live) return;
 		Color c = g.getColor();
 		if(good)
 			g.setColor(Color.red);
@@ -116,4 +119,11 @@ public class Tank {				//面向对象，隐藏细节
 	public Rectangle getRectangle(){
 		return new Rectangle(x, y, TANK_LENGTH, TANK_HIGTH);
 	}
+	public boolean isLive() {
+		return live;
+	}
+	public void setLive(boolean live) {
+		this.live = live;
+	}
+	 
 }
