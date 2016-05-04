@@ -113,7 +113,7 @@ public class Tank {				//面向对象，隐藏细节
 	public void fire() {
 		int x = this.x + Tank.TANK_LENGTH/2 - Missile.MISSILE_LENGTH/2;
 		int y = this.y + Tank.TANK_HIGTH/2 - Missile.MISSILE_HIGTH/2;
-		Missile missile = new Missile(x,y,dir == Direction.STOP?Direction.DOWN:dir,tankClient);
+		Missile missile = new Missile(x,y,barrel,tankClient);
 		tankClient.getMissileList().add(missile);
 	}
 	public Rectangle getRectangle(){

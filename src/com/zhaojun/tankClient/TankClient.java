@@ -16,12 +16,14 @@ public class TankClient extends Frame{
 	private static final long serialVersionUID = 8691694202623904542L;
 	private List<Missile> missileList = new ArrayList<Missile>();
 	private List<Explode> explodeList = new ArrayList<Explode>();
+	private List<Tank> tankList = new ArrayList<Tank>();
 	public static final int GAME_LENGTH = 800; //定义常量，灵活
 	public static final int GAME_HIGTH = 600;
 	private Tank myTank = new Tank(50,50,true,this);
-	private Tank enemyTank = new Tank(100,100,false,this);
 	private Image image = this.createImage(GAME_LENGTH,GAME_HIGTH);
 	public void lauchFrame(){
+		for(int i=0; i<10; i++)
+			tankList.add(new Tank(70*(i+1),50,false,this));
 		this.setLocation(100, 10);
 		this.setSize(GAME_LENGTH, GAME_HIGTH);
 		this.setVisible(true);
@@ -38,14 +40,18 @@ public class TankClient extends Frame{
 	}
 	public void paint(Graphics g) {
 		g.drawString("missileList.count:"+missileList.size(), 10, 50);
+		g.drawString("explodeList.count:"+explodeList.size(), 10, 70);
+		g.drawString("tankList.count:"+tankList.size(), 10, 90);
 		myTank.paint(g);	
-		enemyTank.paint(g);
 		for (Missile missile : missileList) {
-			missile.hitTank(enemyTank);
+			missile.hitTanks(tankList);
 			missile.paint(g);
 		}
 		for (Explode explode : explodeList) {
 			explode.paint(g);
+		}
+		for (Tank tank : tankList) {
+			tank.paint(g);
 		}
 	}
 	

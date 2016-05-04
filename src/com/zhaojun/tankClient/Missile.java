@@ -3,6 +3,7 @@ package com.zhaojun.tankClient;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.List;
 
 import com.zhaojun.tankClient.Tank.Direction;
 
@@ -59,9 +60,20 @@ public class Missile {
 		if(this.getRectangle().intersects(tank.getRectangle()) && tank.isLive()) {
 			tank.setLive(false);
 			live = false;
+			tankClient.getMissileList().remove(this);
 			tankClient.getExplodeList().add(new Explode(x, y, tankClient));
 			return true;
 		}			
+		return false;
+	}
+	public boolean hitTanks(List<Tank> list){
+		for (Tank tank : list) {
+			if(hitTank(tank)){
+				tank.setLive(false);
+				list.remove(tank);
+				return true;
+			}			
+		}
 		return false;
 	}
 }
