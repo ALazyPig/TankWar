@@ -15,12 +15,14 @@ public class Missile {
 	private TankClient tankClient;
 	private int x;
 	private int y;
+	private boolean good;
 	private boolean live = true;
 	private Tank.Direction dir;
-	public Missile(int x, int y, Direction dir, TankClient tankClient) {
+	public Missile(int x, int y, boolean good, Direction dir, TankClient tankClient) {
 		this.x = x;
 		this.y = y;
 		this.dir = dir;
+		this.good = good;
 		this.tankClient = tankClient;
 	}
 	
@@ -57,7 +59,7 @@ public class Missile {
 		return new Rectangle(x, y, MISSILE_LENGTH, MISSILE_HIGTH);
 	}
 	public boolean hitTank(Tank tank){
-		if(this.getRectangle().intersects(tank.getRectangle()) && tank.isLive()) {
+		if(tank.isGood() != good && this.getRectangle().intersects(tank.getRectangle()) && tank.isLive()) {
 			tank.setLive(false);
 			live = false;
 			tankClient.getMissileList().remove(this);
@@ -68,12 +70,20 @@ public class Missile {
 	}
 	public boolean hitTanks(List<Tank> list){
 		for (Tank tank : list) {
-			if(hitTank(tank)){
+			if(tank.isGood() != good && hitTank(tank)){
 				tank.setLive(false);
 				list.remove(tank);
 				return true;
 			}			
 		}
 		return false;
+	}
+	public boolean hitWall(Wall w){
+		if(live && getRectangle().intersects(w.getRectangle())){
+			live = false;
+			tankClient.getMissileList().remove(this);
+			return true;
+		}			
+		return false;			
 	}
 }

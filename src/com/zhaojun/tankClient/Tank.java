@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.util.List;
+import java.util.Random;
 
 public class Tank {				//面向对象，隐藏细节
 	
@@ -12,24 +14,34 @@ public class Tank {				//面向对象，隐藏细节
 	public static final int TANK_LENGTH = 30;
 	public static final int TANK_HIGTH = 30;
 	private int x , y;	
+	private int oldX , oldY;
 	private boolean good;	
 	private TankClient tankClient;
-	private Direction dir = Direction.STOP;
-	private Direction barrel = Direction.DOWN;
+	private Direction dir;
+	private Direction barrel;
 	private boolean live = true;
-	
+	private static Random r = new Random();
+	private int enemyStep = r.nextInt(15)+3;
 	public enum Direction {
 		UP,UP_RIGHT,RIGHT,RIGHT_DOWN,DOWN,LEFT_DOWN,LEFT,UP_LEFT,STOP
 	};	
 	private boolean[] bool= {false,false,false,false};
-	public Tank(int x, int y,boolean good) {
+	public Tank(int x, int y,boolean good,Direction dir) {
 		this.x = x;
 		this.y = y;
 		this.good = good;
+		this.dir = dir;
+		//this.barrel=dir == Direction.STOP?Direction.DOWN:dir;
+		
 	}	
-	public Tank(int x, int y, boolean good, TankClient tankClient) {
-		this(x, y,good);
+	public Tank(int x, int y, boolean good, TankClient tankClient,Direction dir) {
+		this(x, y,good,dir);
 		this.tankClient = tankClient;
+	}
+	
+	public void stay(){
+		x = oldX;
+		y = oldY;
 	}
 
 	public void paint(Graphics g) {
@@ -40,9 +52,9 @@ public class Tank {				//面向对象，隐藏细节
 		else
 			g.setColor(Color.blue);
 		g.fillOval(x, y, TANK_LENGTH, TANK_HIGTH);
-		drawBarrel(g);
-		g.setColor(c);
 		move();
+		drawBarrel(g);
+		g.setColor(c);		
 	}
 	public void drawBarrel(Graphics g) {
 		g.setColor(Color.black);
@@ -60,6 +72,18 @@ public class Tank {				//面向对象，隐藏细节
 		}
 	}
 	public void move() {
+		if(!good){
+			if(enemyStep == 0){
+				Direction[] d = Direction.values();
+				dir = d[r.nextInt(d.length)];
+				enemyStep = r.nextInt(15)+3;
+			}
+			enemyStep--;
+			if(r.nextInt(40) > 37)
+				fire();
+		}
+		oldX = x;
+		oldY = y;
 		switch (dir){
 			case UP: 		y-=YSPEED;			break;
 			case RIGHT: 	x+=XSPEED;			break;
@@ -74,7 +98,8 @@ public class Tank {				//面向对象，隐藏细节
 		}
 		if(this.dir != Direction.STOP) {
 			this.barrel = this.dir;
-		}
+		}else
+			this.barrel = Direction.DOWN;
 		if(x < 0) x = 0;
 		if(y < 30) y = 30;
 		if(x + TANK_LENGTH > TankClient.GAME_LENGTH) x = TankClient.GAME_LENGTH - Tank.TANK_LENGTH;
@@ -107,14 +132,29 @@ public class Tank {				//面向对象，隐藏细节
 			case KeyEvent.VK_LEFT:  bool[1] = false;break;
 			case KeyEvent.VK_UP: 	bool[2] = false;break;
 			case KeyEvent.VK_DOWN: 	bool[3] = false;break;
-			case KeyEvent.VK_CONTROL:fire();break;
+			case KeyEvent.VK_CONTROL:if(live) fire();break;
 		}
 	}
 	public void fire() {
 		int x = this.x + Tank.TANK_LENGTH/2 - Missile.MISSILE_LENGTH/2;
 		int y = this.y + Tank.TANK_HIGTH/2 - Missile.MISSILE_HIGTH/2;
-		Missile missile = new Missile(x,y,barrel,tankClient);
+		Missile missile = new Missile(x,y,good,barrel,tankClient);
 		tankClient.getMissileList().add(missile);
+	}
+	public boolean hitWall(Wall w){
+		if(live && getRectangle().intersects(w.getRectangle())){
+			stay();
+			return true;
+		}			
+		return false;
+			
+	}
+	public void hitTanks(List<Tank> tanks){
+		for (Tank tank : tanks) {
+			if(this != tank && getRectangle().intersects(tank.getRectangle())) {
+				this.stay();
+			}
+		}						
 	}
 	public Rectangle getRectangle(){
 		return new Rectangle(x, y, TANK_LENGTH, TANK_HIGTH);
@@ -124,6 +164,9 @@ public class Tank {				//面向对象，隐藏细节
 	}
 	public void setLive(boolean live) {
 		this.live = live;
+	}
+	public boolean isGood() {
+		return good;
 	}
 	 
 }
